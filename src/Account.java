@@ -1,3 +1,4 @@
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -10,8 +11,7 @@ public class Account{
     private double credit;
     private double maxBalance;
 
-    private ArrayList<Double> history = new ArrayList<>();
-    private ArrayList<String> historyType = new ArrayList<>();
+    private ArrayList<Transaction> history = new ArrayList<>();
 
     public Account(){
         balance = 500.00;
@@ -26,19 +26,19 @@ public class Account{
             System.out.println("\nDeposit exceeds the maximum balance limit.");
         } else{
             balance += amount;
-            history.add(amount);
-            historyType.add("Deposit");
+            Transaction transaction = new Transaction("Deposit", amount, balance);
+            history.add(transaction);
             System.out.println("Deposit Successful!");
             System.out.printf(brazilianLocale, "Your new balance is R$ : %.2f%n", balance);
         }
     }
     public void withdraw(double amount){
-        if (amount > balance){
+        if (amount > 0 && amount > balance){
             System.out.println("\nInsufficient balance, please try again.");
         } else if(amount > 0) {
             balance -= amount;
-            history.add(amount);
-            historyType.add("Withdraw");
+            Transaction transaction = new Transaction("Withdraw", amount, balance);
+            history.add(transaction);
             System.out.println("\nWithdrawal successful!");
             System.out.printf(brazilianLocale, "Your new balance is R$ %.2f%n", balance);
         } else {
@@ -46,12 +46,12 @@ public class Account{
         }
     }
     public void transfer(double amount){
-        if (amount > balance) {
+        if (amount > 0 && amount > balance) {
             System.out.println("\nInsufficient balance, please try again.");
         } else if (amount > 0) {
             balance -= amount;
-            history.add(amount);
-            historyType.add("Transfer");
+            Transaction transaction = new Transaction("Transfer", amount, balance);
+            history.add(transaction);
             System.out.println("\nTransfer successful!");
             System.out.printf(brazilianLocale, "\n You sent R$ %.2f to the account.%n", amount);
             System.out.printf(brazilianLocale, "Your new balance is R$ %.2f%n", balance);
@@ -60,8 +60,17 @@ public class Account{
         }
     }
     public void bankStatement(){
+        System.out.println("\n==================================");
+        System.out.println("            FLYBANK");
+        System.out.println("         EXTRATO BANCARIO");
+        System.out.println("==================================");
         for(int i = history.size() - 1; i >= 0; i--){
-            System.out.printf(brazilianLocale, "%s : R$ %.2f%n", historyType.get(i), history.get(i));
+            Transaction transaction = history.get(i);
+
+            System.out.println("----------------------------------");
+            System.out.println("Type : " + transaction.getType());
+            System.out.printf(brazilianLocale, "Amount : R$ %.2f%n", transaction.getAmount());
+            System.out.printf(brazilianLocale, "Balance after operation : R$ %.2f%n", transaction.getBalanceAfter());
         }
     }
     public double getBalance(){
